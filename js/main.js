@@ -25,21 +25,30 @@ setNavState();
 window.addEventListener("scroll", setNavState, { passive: true });
 window.addEventListener("resize", setNavState);
 
-toggle?.addEventListener("click", () => {
-  const open = !menu?.classList.contains("is-open");
+const setMenuOpen = (open) => {
   menu?.classList.toggle("is-open", open);
   document.body.classList.toggle("menu-open", open);
-  toggle.setAttribute("aria-expanded", String(open));
-  toggle.setAttribute("aria-label", open ? "Close menu" : "Open menu");
+  toggle?.setAttribute("aria-expanded", String(open));
+  toggle?.setAttribute("aria-label", open ? "Close menu" : "Open menu");
+};
+
+toggle?.addEventListener("click", (event) => {
+  event.stopPropagation();
+  setMenuOpen(!menu?.classList.contains("is-open"));
 });
 
 menu?.querySelectorAll("a").forEach((link) => {
-  link.addEventListener("click", () => {
-    menu.classList.remove("is-open");
-    document.body.classList.remove("menu-open");
-    toggle?.setAttribute("aria-expanded", "false");
-    toggle?.setAttribute("aria-label", "Open menu");
-  });
+  link.addEventListener("click", () => setMenuOpen(false));
+});
+
+document.addEventListener("click", (event) => {
+  if (!menu?.classList.contains("is-open")) return;
+  if (nav?.contains(event.target)) return;
+  setMenuOpen(false);
+});
+
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape") setMenuOpen(false);
 });
 
 if (heroX && !reduceMotion) {
